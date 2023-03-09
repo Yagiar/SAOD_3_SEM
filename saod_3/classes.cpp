@@ -10,8 +10,8 @@ int main()
 	cout<< c << endl;
 	Complex a(1, 2), b = 10;
 	cout << a << ", " << b << endl;
-	Complex plus = b + 6, minus = b - 6, multiply = b * 3, delenie = b / 5, PlusMin = 0 + 6 - 6, MultDel = 5 * 2 / 2, HugeDel = 5 / 5;
-	cout << plus << " " << minus << " " << multiply << " " << delenie << endl;
+	Complex plus = b + 6, minus = b - 6, multiply = b * 3, del = b / 5, PlusMin = 0 + 6 - 6, MultDel = 5 * 2 / 2, HugeDel = 5 / 5;
+	cout << plus << " " << minus << " " << multiply << " " << del << endl;
 	cout << PlusMin << " " << MultDel << " " << HugeDel << endl;
 	cout << a.Conjugate() << endl;
 	cout << a.Mod() << endl;
@@ -28,4 +28,5 @@ int main()
 	cout << x << " " << y << endl;
 	Complex* pk = new Complex[3]{ 1,(4,8) };
 	cout << pk[1].Re;
+	delete[] v, pk;
 }
