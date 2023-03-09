@@ -8,14 +8,14 @@ int main()
 {
 	Complex c;
 	cout<< c << endl;
-	Complex a(1, 2), b = 10;
-	cout << a << ", " << b << endl;
-	Complex plus = b + 6, minus = b - 6, multiply = b * 3, del = b / 5, PlusMin = 0 + 6 - 6, MultDel = 5 * 2 / 2, HugeDel = 5 / 5;
+	Complex first(4, 3), b = 5;
+	cout << first << ", " << b << endl;
+	Complex plus = b + 2, minus = b - 2, multiply = b * 5 del = b / 3, PlusMin = 0 + 6 - 6, MultDel = 5 * 2 / 2, YourselfDel = 5 / 5;
 	cout << plus << " " << minus << " " << multiply << " " << del << endl;
-	cout << PlusMin << " " << MultDel << " " << HugeDel << endl;
-	cout << a.Conjugate() << endl;
-	cout << a.Mod() << endl;
-	cout << a.Arg() << endl;
+	cout << PlusMin << " " << MultDel << " " << YourselfDel << endl;
+	cout << first.Conjugate() << endl;
+	cout << first.Mod() << endl;
+	cout << first.Arg() << endl;
 	Complex v[4]{ 1,2, Complex(2,3) };
 	for (int i = 0; i < 4; i++)
 		cout << v[i];
