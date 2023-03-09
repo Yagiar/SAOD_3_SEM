@@ -57,6 +57,7 @@ public:
 			else if (Im < 0)
 				return -acos(0); 
 		}
+		return 0;
 	}
 };
 inline ostream& operator << (ostream& o, const Complex& c)
