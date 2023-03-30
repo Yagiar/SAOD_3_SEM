@@ -1,7 +1,10 @@
 #include <iostream>
 #include <exception>
 #include <stdexcept>
+#include <numeric>
+
 using namespace std;
+
 template <typename T>
 class Node {
 public:
@@ -13,6 +16,7 @@ public:
         this->next = next;
     }
 };
+
 template <typename T>
 class LinkedList {
 private:
@@ -29,33 +33,42 @@ public:
     }
 
     ~LinkedList() {
-        clear();
         delete head;
+        delete tail;
     }
 
     void push_back(T value) {
         Node<T>* new_node = new Node<T>(value);
-        if (tail == nullptr) {
+        if (length == 0) {
             head->next = new_node;
-            tail = new_node;
         }
         else {
             tail->next = new_node;
-            tail = new_node;
         }
+        tail = new_node;
         length++;
     }
-
 
     void push_front(T value) {
         Node<T>* temp = new Node<T>(value, head->next);
         head->next = temp;
+        if (length == 0) {
+            tail = temp;
+        }
         length++;
     }
 
     void insert(size_t idx, T value) {
         if (idx < 0 || idx > length) {
             throw out_of_range("Out Of range");
+            return;
+        }
+        if (idx == 0) {
+            push_front(value);
+            return;
+        }
+        if (idx == length) {
+            push_back(value);
             return;
         }
         Node<T>* prev = head;
@@ -72,31 +85,47 @@ public:
             throw length_error("List is Empty");
             return;
         }
+        if (length == 1) {
+            delete tail;
+            head->next = tail;
+            length--;
+            return;
+        }
         Node<T>* prev = head;
         while (prev->next != tail) {
             prev = prev->next;
         }
-        Node<T>* temp = prev->next;
-        prev->next = tail;
-        delete temp;
+        delete tail;
+        tail = prev;
+        tail->next = nullptr;
         length--;
     }
 
     void pop_front() {
         if (length == 0) {
             throw length_error("List is Empty");
-
             return;
         }
         Node<T>* temp = head->next;
         head->next = temp->next;
         delete temp;
         length--;
+        if (length == 0) {
+            tail = head;
+        }
     }
 
     void remove_at(size_t index) {
         if (index < 0 || index >= length) {
             throw out_of_range("Out Of range");
+            return;
+        }
+        if (index == 0) {
+            pop_front();
+            return;
+        }
+        if (index == length - 1) {
+            pop_back();
             return;
         }
         Node<T>* prev = head;
@@ -124,6 +153,7 @@ public:
         }
         return curr->data;
     }
+
     size_t size() const {
         return length;
     }
@@ -151,11 +181,37 @@ public:
             throw out_of_range("Out Of range");
             return T();
         }
-        Node<T>* prev = head;
-        while (prev->next != tail) {
-            prev = prev->next;
-        }
-        return prev->data;
+        return tail->data;
     }
 
+    class ListIterator {
+    private:
+        Node<T>* curr;
+    public:
+        ListIterator(Node<T>* node = nullptr) {
+            curr = node;
+        }
+        ListIterator& operator++() {
+            curr = curr->next;
+            return *this;
+        }
+        T& operator*() const {
+            return curr->data;
+        }
+        bool operator==(const ListIterator& other) const {
+            return curr == other.curr;
+        }
+        bool operator!=(const ListIterator& other) const {
+            return curr != other.curr;
+        }
+    };
+
+    ListIterator begin() const {
+        return ListIterator(head->next);
+    }
+
+    ListIterator end() const {
+        return ListIterator(tail->next);
+    }
 };
+
