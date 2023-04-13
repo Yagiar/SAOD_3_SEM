@@ -192,33 +192,52 @@ public:
         return tail->data;
     }
  
-    class ListIterator {
-    private:
-        Node<T>* curr;
+    class iterator {
     public:
-        ListIterator(Node<T>* node = nullptr) {
-            curr = node;
+        typedef T value_type;
+        typedef T& reference;
+        typedef T* pointer;
+        typedef std::forward_iterator_tag iterator_category;
+        typedef int difference_type;
+
+        iterator(Node<T>* ptr = nullptr) : node_(ptr) {}
+
+        reference operator*() const {
+            return node_->data;
         }
-        ListIterator& operator++() {
-            curr = curr->next;
+
+        pointer operator->() const {
+            return &(node_->data);
+        }
+
+        iterator& operator++() {
+            node_ = node_->next;
             return *this;
         }
-        T& operator*() const {
-            return curr->data;
+
+        iterator operator++(int) {
+            iterator temp(*this);
+            node_ = node_->next;
+            return temp;
         }
-        bool operator==(const ListIterator& other) const {
-            return curr == other.curr;
+
+        bool operator==(const iterator& rhs) const {
+            return node_ == rhs.node_;
         }
-        bool operator!=(const ListIterator& other) const {
-            return curr != other.curr;
+
+        bool operator!=(const iterator& rhs) const {
+            return node_ != rhs.node_;
         }
+
+    private:
+        Node<T>* node_;
     };
- 
-    ListIterator begin() const {
-        return ListIterator(head->next);
+
+    iterator begin() const {
+        return iterator(head->next);
     }
- 
-    ListIterator end() const {
-        return ListIterator(tail->next);
+
+    iterator end() const {
+        return iterator(tail);
     }
 };
