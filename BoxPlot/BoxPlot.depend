@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1682588397 source:c:\users\fox2f\onedrive\Рабочий стол\Дейкстра\boxplot\src\boxplot.cpp
+
+1682592649 source:c:\users\fox2f\onedrive\Рабочий стол\Дейкстра\boxplot\main.cpp
+	<iostream>
+	"BoxPlot.h"
+
+1682592795 c:\users\fox2f\onedrive\Рабочий стол\Дейкстра\boxplot\include\boxplot.h
+	<vector>
+	<algorithm>
+	<cmath>
+
