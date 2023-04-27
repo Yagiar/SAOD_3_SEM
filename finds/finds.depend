@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1682593507 source:c:\users\fox2f\onedrive\Рабочий стол\Дейкстра\finds\src\timer.cpp
+
+1682594106 source:c:\users\fox2f\onedrive\Рабочий стол\Дейкстра\finds\main.cpp
+	<iostream>
+	<string>
+	<chrono>
+	<fstream>
+	<vector>
+	"timer.h"
+
+1682593508 c:\users\fox2f\onedrive\Рабочий стол\Дейкстра\finds\include\timer.h
+	<chrono>
+	<iostream>
+
