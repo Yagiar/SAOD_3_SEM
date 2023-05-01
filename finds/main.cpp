@@ -60,13 +60,10 @@ size_t kmp(const std::string& str, const std::string& sub)
 
 size_t bm(const std::string& str, const std::string& sub)
 {
-    int b[128];//(128, -1);
+    int b[128];
     for(int i = 0; i < 128; i++) b[i] = -1;
     for (size_t i = 0; i < sub.size(); i++)
         b[size_t(sub[i])] = i;
-    //b[0] = 4;
-    //b[1] = 3;
-    //b[2] = 2;
     int s = 0;
     int m = sub.length();
     int n = str.length();
