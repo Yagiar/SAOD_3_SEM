@@ -18,7 +18,7 @@ void SufTree::extend(int phase)
 
     // сколько суффиксов осталось встроить. (Все предыдущие + 1 из последнего входного символа)
     remainder++;
-    
+
     // Перебираем все недостроенные суффиксы!
     while (remainder > 0)
     {
@@ -75,7 +75,7 @@ void SufTree::extend(int phase)
             // запомним, где кончается текущее ребро и его целевой узел
             int end = e.end;
             Node* pnode = e.node;
-            
+
             // Сдвигаем конец текущего ребра
             e.end = e.start + ap.length-1;
             // И связываем его с новым узлом
@@ -86,7 +86,7 @@ void SufTree::extend(int phase)
             tail.node = pnode;
             // Добавим остаток во вновь созданный узел
             split->children[input[e.start + ap.length]] = tail;
-            
+
             // и ребро из последнего символа
             split->children[input[phase]] = Edge(phase);
             // На этой фазе уже создавался внутрениий узел. Из него сошлемся на split
@@ -138,7 +138,7 @@ void SufTree::finalize()
             ap.edge = phase; // индекс текущего символа в тексте определяет ребро, по которому будем двигаться
 
         // ищем ребро активного узла, которое начинается на эту букву
-        
+
         // !!! Обрабтаем возможную ситуацию с ap.edge == -1;
         auto find = ap.node->children.end();
         if(ap.edge>=0)
@@ -147,7 +147,7 @@ void SufTree::finalize()
         // не нашли
         if (find == ap.node->children.end())
         {
-            // Добавим в узел признак leaf. 
+            // Добавим в узел признак leaf.
             // Вместо ap.node->children[input[ap.edge]] = Edge(phase); - добавления ребра из уникального символа
             // Если он установлен, значит ребро, которое заканчивается в этом узле - лист!
             if(ap.node != root)

@@ -1,4 +1,3 @@
-#pragma once
 #include <iostream>	// Нужно, т.к. есть методы визуализации
 #include <map>		// для хранения ребер ведущих к дочерним узлам
 #include "Edge.h"
@@ -51,18 +50,13 @@ public:
 	// Методы построения дерева
 	void extend(int i);
 	void finalize();
-	
-	// Лучше здесь, т.к. нужен индекс последнего прочитаннного смивола. 
+
+	// Лучше здесь, т.к. нужен индекс последнего прочитаннного смивола.
 	int edgeLen(Edge& e) {
 		return e.end >= 0 ? e.end - e.start + 1 : last_read - e.start + 1;
 	}
-#pragma region Прикладные методы
 private:
-	/// <summary>
-	/// Заполняет поле sufIdx листовых ребер индексом суффикса во входном потоке
-	/// </summary>
-	/// <param name="n">указатель на узел</param>
-	/// <param name="len">длина ребер от корня до узла</param>
+
 	void fillLeaves(Node* n, int len)
 	{
 		for (auto& p : n->children)
@@ -122,7 +116,7 @@ private:
 		return n->maxIdx;
 	}
 	void fillMaxLen(Node* n, int len) {
-		int maxIdx = -1;
+	//	std::size_t maxIdx = -1;
 		(*n).maxLen = min(len, (*n).maxIdx - (*n).minIdx);
 		for (auto& p : n->children)
 		{
@@ -162,8 +156,7 @@ public:
 	Node* GetMax() {
 		return getMax(root);
 	}
-	
-#pragma endregion
+
 private:
 	// методы визуализации
 	/// <summary>
@@ -207,7 +200,7 @@ private:
 		}
 	}
 
-public: 
+public:
 	void ShowTree()
 	{
 		showNode(root, 0);

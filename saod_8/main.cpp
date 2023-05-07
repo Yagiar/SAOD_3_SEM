@@ -69,11 +69,11 @@ int main()
     auto start = chrono::steady_clock::now();
 
     SufTree st(s.c_str());
-    for (int i = 0; i < s.length(); i++)
+    for (std::size_t i = 0; i < s.length(); i++)
         st.extend(i);
     // и завершаем построение, делая все суффиксы явными!
     st.finalize();
-    
+
     auto stop = chrono::steady_clock::now();
 
     st.FillLeaves();    // Можно и без него, но не будут заполнены индексы суффиксов.
