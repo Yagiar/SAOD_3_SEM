@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1684342493 source:c:\users\fox2f\onedrive\Рабочий стол\Дейкстра\decoder_fib\main.cpp
+	<iostream>
+	<fstream>
+	<unordered_map>
+	<vector>
+	<algorithm>
+
