@@ -57,10 +57,12 @@ std::vector<bool> generateFibonacciCode(int number) {
     return code;
 }
 
-void writeMetadata(const std::string& filename, const std::unordered_map<char, std::vector<bool>>& codes) {
+void writeMetadataAndCompressedData(const std::string& filename, const std::unordered_map<char, std::vector<bool>>& codes, const std::vector<char>& compressedData) {
     std::ofstream file(filename, std::ios::binary);
-    unsigned int size = codes.size();
-    file.write(reinterpret_cast<const char*>(&size), sizeof(unsigned int));
+    unsigned int metadataSize = codes.size();
+    unsigned int compressedDataSize = compressedData.size();
+
+    file.write(reinterpret_cast<const char*>(&metadataSize), sizeof(unsigned int));
 
     for (const auto& entry : codes) {
         file.write(&entry.first, sizeof(char));
@@ -71,6 +73,9 @@ void writeMetadata(const std::string& filename, const std::unordered_map<char, s
             file.write(reinterpret_cast<const char*>(&bit), sizeof(unsigned char));
         }
     }
+
+    file.write(reinterpret_cast<const char*>(&compressedDataSize), sizeof(unsigned int));
+    file.write(reinterpret_cast<const char*>(compressedData.data()), compressedDataSize);
 
     file.close();
 }
@@ -110,25 +115,23 @@ std::unordered_map<char, std::vector<bool>> readMetadata(const std::string& file
 void compressFile(const std::string& inputFile, const std::string& outputFile) {
     std::unordered_map<char, int> frequencyMap = countSymbolFrequency(inputFile);
 
-    // Создаем вектор пар символ-частота
+    // Create a vector of symbol-frequency pairs
     std::vector<std::pair<char, int>> symbols(frequencyMap.begin(), frequencyMap.end());
 
-    // Сортируем вектор по частоте символов, наиболее часто встречающиеся символы идут первыми
+    // Sort the vector by symbol frequency, with the most frequent symbols first
     std::sort(symbols.begin(), symbols.end(),
               [](const std::pair<char, int>& a, const std::pair<char, int>& b) {
                   return a.second > b.second;
               });
 
-    // Создаем карту кодов Фибоначчи
+    // Create a map of Fibonacci codes
     std::unordered_map<char, std::vector<bool>> codes;
     for (int i = 0; i < symbols.size(); ++i) {
-        codes[symbols[i].first] = generateFibonacciCode(i+1);
+        codes[symbols[i].first] = generateFibonacciCode(i + 1);
     }
 
-    writeMetadata(outputFile + ".meta", codes);
-
+    std::vector<char> compressedData;
     std::ifstream inputFileStream(inputFile, std::ios::binary);
-    std::ofstream outputFileStream(outputFile, std::ios::binary);
     char c;
     std::vector<bool> buffer;
 
@@ -142,7 +145,7 @@ void compressFile(const std::string& inputFile, const std::string& outputFile) {
                 byte |= (buffer[i] << (7 - i));
             }
 
-            outputFileStream.write(&byte, sizeof(char));
+            compressedData.push_back(byte);
             buffer.erase(buffer.begin(), buffer.begin() + 8);
         }
     }
@@ -154,13 +157,13 @@ void compressFile(const std::string& inputFile, const std::string& outputFile) {
             lastByte |= (buffer[i] << (7 - i));
         }
 
-        outputFileStream.write(&lastByte, sizeof(char));
+        compressedData.push_back(lastByte);
     }
 
     inputFileStream.close();
-    outputFileStream.close();
-}
 
+    writeMetadataAndCompressedData(outputFile, codes, compressedData);
+}
 
 char extractSymbol(const std::vector<bool>& buffer, int& index) {
     char symbol = 0;
@@ -171,14 +174,40 @@ char extractSymbol(const std::vector<bool>& buffer, int& index) {
 }
 
 void decompressFile(const std::string& inputFile, const std::string& outputFile) {
-    std::unordered_map<char, std::vector<bool>> codes = readMetadata(inputFile + ".meta");
+    std::unordered_map<char, std::vector<bool>> codes;
     std::ifstream inputFileStream(inputFile, std::ios::binary);
+
+    unsigned int metadataSize;
+    inputFileStream.read(reinterpret_cast<char*>(&metadataSize), sizeof(unsigned int));
+
+    for (unsigned int i = 0; i < metadataSize; ++i) {
+        char symbol;
+        inputFileStream.read(&symbol, sizeof(char));
+        unsigned int codeSize;
+        inputFileStream.read(reinterpret_cast<char*>(&codeSize), sizeof(unsigned int));
+
+        std::vector<bool> code(codeSize);
+        for (unsigned int j = 0; j < codeSize; ++j) {
+            unsigned char bit;
+            inputFileStream.read(reinterpret_cast<char*>(&bit), sizeof(unsigned char));
+            code[j] = bit;
+        }
+
+        codes[symbol] = code;
+    }
+
+    unsigned int compressedDataSize;
+    inputFileStream.read(reinterpret_cast<char*>(&compressedDataSize), sizeof(unsigned int));
+
+    std::vector<char> compressedData(compressedDataSize);
+    inputFileStream.read(reinterpret_cast<char*>(compressedData.data()), compressedDataSize);
+
+    inputFileStream.close();
+
     std::ofstream outputFileStream(outputFile, std::ios::binary);
 
-    char c;
     std::vector<bool> buffer;
-
-    while (inputFileStream.get(c)) {
+    for (char c : compressedData) {
         for (int i = 7; i >= 0; --i) {
             buffer.push_back((c >> i) & 1);
 
@@ -192,19 +221,35 @@ void decompressFile(const std::string& inputFile, const std::string& outputFile)
         }
     }
 
-    inputFileStream.close();
     outputFileStream.close();
 }
 
+
 int main() {
-    std::string inputFile = "input.txt";
-    std::string compressedFile = "compressed.bin";
-    std::string decompressedFile = "decompressed.txt";
+    char cOperation;
+    std::cout << "Enter the first letter of the operation (c - compression; d - decompression):";
+    std::cin >> cOperation; std::cin.get();
 
-    compressFile(inputFile, compressedFile);
-    decompressFile(compressedFile, decompressedFile);
+    if (cOperation != 'c' && cOperation != 'd') {
+        printf("Error: can't recognize this operation!...\n");
+        return -1;
+    }
 
-   // коэф сжатия я посчитал это input.txt/ (compressed.bin+compressed.bin.meta)= 57988 / ( 1279 + 46098 ) = 1,223969436646474
+    std::string sFInName, sFOutName;
+
+   std:: cout << "Enter name of Input File:" << std::endl;
+    getline(std::cin, sFInName);
+    std::cout << "Enter name of Output File:" << std::endl;
+    getline(std::cin, sFOutName);
+
+    if (cOperation == 'c') {
+        compressFile(sFInName, sFOutName);
+       std:: cout << "Compression completed!" << std::endl;
+    } else if (cOperation == 'd') {
+        decompressFile(sFInName, sFOutName);
+       std:: cout << "Decompression completed!" << std::endl;
+    }
+
 
     return 0;
 }
